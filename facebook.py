@@ -340,9 +340,9 @@ class GraphAPI(object):
             file = urllib.request.urlopen(uri, post_data)
         try:
             fileInfo = file.info()
-            if fileInfo.maintype == 'text':
-                response = _parse_json(file.read())
-            elif fileInfo.maintype == 'image':
+            if fileInfo.get_content_maintype() == 'text':
+                response = _parse_json(file.read().decode('utf-8'))
+            elif fileInfo.get_content_maintype() == 'image':
                 mimetype = fileInfo['content-type']
                 response = {
                     "data": file.read(),
