@@ -16,9 +16,9 @@
 import facebook
 import os
 import unittest
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
-from StringIO import StringIO
+from io import StringIO
 
 
 class FacebookTestCase(unittest.TestCase):
@@ -50,7 +50,7 @@ class FakeFileInfo(object):
             self.__dict__.update(attrs)
 
 
-class FakeHTTPError(StringIO, urllib2.HTTPError):
+class FakeHTTPError(StringIO, urllib.error.HTTPError):
     """
     Mocks out HTTPError with a StringIO so that we can make it look like an
     HTTP stream
@@ -79,7 +79,7 @@ class MockURLOpenTestCase(unittest.TestCase):
 
     def setUp(self):
         self.api = facebook.GraphAPI('bogustoken')
-        self.urlopen = urllib2.urlopen
+        self.urlopen = urllib.request.urlopen
 
         def urlopen(*args, **kwargs):
             self.urlopen_args = args
@@ -90,7 +90,7 @@ class MockURLOpenTestCase(unittest.TestCase):
 
             return self.urlopen_return
 
-        urllib2.urlopen = urlopen
+        urllib.request.urlopen = urlopen
 
 
 class TestGetAppAccessToken(FacebookTestCase):

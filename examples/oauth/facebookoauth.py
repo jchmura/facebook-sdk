@@ -32,14 +32,14 @@ FACEBOOK_APP_SECRET = "your app secret"
 
 import base64
 import cgi
-import Cookie
+import http.cookies
 import email.utils
 import hashlib
 import hmac
 import logging
 import os.path
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import wsgiref.handlers
 
 from django.utils import simplejson as json
@@ -85,16 +85,16 @@ class LoginHandler(BaseHandler):
         if self.request.get("code"):
             args["client_secret"] = FACEBOOK_APP_SECRET
             args["code"] = self.request.get("code")
-            response = cgi.parse_qs(urllib.urlopen(
+            response = cgi.parse_qs(urllib.request.urlopen(
                 "https://graph.facebook.com/oauth/access_token?" +
-                urllib.urlencode(args)).read())
+                urllib.parse.urlencode(args)).read())
             access_token = response["access_token"][-1]
 
             # Download the user profile and cache a local instance of the
             # basic profile info
-            profile = json.load(urllib.urlopen(
+            profile = json.load(urllib.request.urlopen(
                 "https://graph.facebook.com/me?" +
-                urllib.urlencode(dict(access_token=access_token))))
+                urllib.parse.urlencode(dict(access_token=access_token))))
             user = User(key_name=str(profile["id"]), id=str(profile["id"]),
                         name=profile["name"], access_token=access_token,
                         profile_url=profile["link"])
@@ -105,7 +105,7 @@ class LoginHandler(BaseHandler):
         else:
             self.redirect(
                 "https://graph.facebook.com/oauth/authorize?" +
-                urllib.urlencode(args))
+                urllib.parse.urlencode(args))
 
 
 class LogoutHandler(BaseHandler):
@@ -119,7 +119,7 @@ def set_cookie(response, name, value, domain=None, path="/", expires=None):
     timestamp = str(int(time.time()))
     value = base64.b64encode(value)
     signature = cookie_signature(value, timestamp)
-    cookie = Cookie.BaseCookie()
+    cookie = http.cookies.BaseCookie()
     cookie[name] = "|".join([value, timestamp, signature])
     cookie[name]["path"] = path
     if domain:

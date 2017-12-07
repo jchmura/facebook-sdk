@@ -34,7 +34,7 @@ import facebook
 import webapp2
 import os
 import jinja2
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from google.appengine.ext import db
 from webapp2_extras import sessions
@@ -134,7 +134,7 @@ class HomeHandler(BaseHandler):
 
     def post(self):
         url = self.request.get('url')
-        file = urllib2.urlopen(url)
+        file = urllib.request.urlopen(url)
         graph = facebook.GraphAPI(self.current_user['access_token'])
         response = graph.put_photo(file, "Test Image")
         photo_url = ("http://www.facebook.com/"

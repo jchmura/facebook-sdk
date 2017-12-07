@@ -41,7 +41,7 @@ define("mysql_password", help="MySQL database password")
 class BaseHandler(tornado.web.RequestHandler):
     """Implements authentication via the Facebook JavaScript SDK cookie."""
     def get_current_user(self):
-        cookies = dict((n, self.cookies[n].value) for n in self.cookies.keys())
+        cookies = dict((n, self.cookies[n].value) for n in list(self.cookies.keys()))
         cookie = facebook.get_user_from_cookie(
             cookies, options.facebook_app_id, options.facebook_app_secret)
         if not cookie:
